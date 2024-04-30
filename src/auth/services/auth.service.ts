@@ -11,18 +11,18 @@ export class AuthService{
         private usuarioService: UsuarioService,
         private jwtService: JwtService,
         private bcrypt: Bcrypt
-    ){ }
+    ){}
 
     async validateUser(username: string, password: string): Promise<any>{
 
-        const buscaUsuario = await this.usuarioService.findByUsuario(username)
+        const buscaUsuario = await this.usuarioService.findByUsuario(username);
 
         if(!buscaUsuario)
             throw new HttpException('Usuário não encontrado!', HttpStatus.NOT_FOUND)
 
         const matchPassword = await this.bcrypt.compararSenhas(buscaUsuario.senha, password)
 
-        if(buscaUsuario && matchPassword){
+        if(buscaUsuario && matchPassword) {
             const { senha, ...resposta } = buscaUsuario
             return resposta
         }
@@ -37,10 +37,13 @@ export class AuthService{
 
         const buscaUsuario = await this.usuarioService.findByUsuario(usuarioLogin.usuario)
 
+        if(!buscaUsuario)
+            throw new HttpException('Usuário não Encontrado!', HttpStatus.NOT_FOUND)
+
         return{
             id: buscaUsuario.id,
             nome: buscaUsuario.nome,
-            usuario: usuarioLogin.usuario,
+            usuario: buscaUsuario.usuario,
             senha: '',
             foto: buscaUsuario.foto,
             token: `Bearer ${this.jwtService.sign(payload)}`,
